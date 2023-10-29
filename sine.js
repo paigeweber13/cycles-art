@@ -1,32 +1,49 @@
 let curveSegments = [];
 
 function setup() {
-  createCanvas(400, 400);
+  // frameRate(12); // animate slowly
 
-  segmentLength = 100;
-  numSteps = 5;
+  canvasWidth = 400;
+  canvasHeight = 400;
 
-  posA = createVector(100, 100);
-  posB = createVector(posA.x + segmentLength, 100);
-  curveDiffY = 20;
+  createCanvas(canvasWidth, canvasHeight);
 
-  for (var i = 0; i < numSteps; i++) { 
-    curveSegments.push(new Line(posA, posB));
-    posA = posB.copy();
-    posB.y = posB.y + curveDiffY;
+  // stepSize = 10;
+  stepSize = 1;
+  center = canvasHeight / 2;
+  amplitude = canvasHeight / 4;
+  period = canvasWidth / 4;
 
-    // little bit of math to find out where x is while keeping segment length
-    // constant
-    posB.x = posB.x + Math.sqrt(segmentLength ** 2 - curveDiffY ** 2);
+  pos = createVector(0, 200);
+
+  while (pos.x < canvasWidth) {
+    posNext = sineNext(pos, stepSize, amplitude, period);
+    curveSegments.push(new Line(pos, posNext));
+    // pos = posNext.copy();
+    pos = posNext;
   }
-
-  console.log(curveSegments);
 }
 
+let i = 0;
 function draw() {
-  for (var i = 0; i < curveSegments.length; i++) { 
+  if (i < curveSegments.length) {
     curveSegments[i].display();
+    i++;
   }
+}
+
+function sineNext(pos, stepSize, amplitude, period) {
+  /* pos: vector
+   * stepSize: float
+   * amplitude: float
+   * 
+   * returns: vector
+   */
+
+  newX = pos.x + stepSize;
+  b = (2 * Math.PI) / period
+  newY = center + amplitude * Math.sin(b * newX);
+  return createVector(newX, newY);
 }
 
 class Line {
